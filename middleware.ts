@@ -5,9 +5,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import getFirebaseAppServerSide from './lib/firebase/get-firebase-app-server-side';
 
-const { auth, firebaseApp } = getFirebaseAppServerSide();
-
-const appCheck = firebaseApp ? getAppCheck(firebaseApp) : null;
+const { auth } = getFirebaseAppServerSide();
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl.pathname;

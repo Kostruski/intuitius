@@ -1,8 +1,5 @@
 import { Theme } from '@radix-ui/themes';
 import { Metadata } from 'next';
-import { Toaster } from 'sonner';
-
-import { ThemeProvider } from '@/components/custom/theme-provider';
 
 import './globals.css';
 
@@ -23,21 +20,10 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        {/* <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-				> */}
         <Theme>
           <LoginStatus />
           {children}
         </Theme>
-
-        {/* <Toaster position="top-center" />  */}
-        {/* <Navbar /> */}
-
-        {/* </ThemeProvider> */}
       </body>
     </html>
   );
