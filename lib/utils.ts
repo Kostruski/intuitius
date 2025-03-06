@@ -141,13 +141,24 @@ export function getTitleFromChat(chat: Chat) {
 }
 
 export const postToken = async (token: string) => {
-  fetch('/api/auth', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ idToken: token }),
-  });
+  try {
+    const response = await fetch('/api/auth', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idToken: token }),
+    });
+
+    if (response.ok) {
+      console.log('Login successful');
+      // Redirect or update UI
+    } else {
+      console.error('Login failed');
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+  }
 };
 
 export const handleLogout = async () => {
@@ -164,5 +175,40 @@ export const handleLogout = async () => {
     }
   } catch (error) {
     console.error('Logout error:', error);
+  }
+};
+
+export type RegisterProps = {
+  idToken: string;
+  companyName: string;
+  userName: string;
+  role?: 'user' | 'manager';
+};
+
+export const handleUserRegister = async (registerProps: RegisterProps) => {
+  const { idToken, companyName, userName, role = 'user' } = registerProps;
+
+  if (!idToken) {
+    console.error('Token is required');
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idToken, companyName, userName, role }),
+    });
+
+    if (response.ok) {
+      console.log('Register successful');
+      // Redirect or update UI
+    } else {
+      console.error('Register failed');
+    }
+  } catch (error) {
+    console.error('Register error:', error);
   }
 };
