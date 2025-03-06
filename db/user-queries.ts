@@ -23,7 +23,7 @@ async function createUser(userData: User) {
     if (!db) {
       throw new Error('Firestore is not available');
     }
-    const userRef = await addDoc(collection(db, 'users'), userData);
+    const userRef = await db.collection('users').add(userData);
     console.log('Document written with ID: ', userRef.id);
   } catch (e) {
     console.error('Error adding document: ', e);

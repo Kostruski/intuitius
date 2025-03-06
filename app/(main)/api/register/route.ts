@@ -22,6 +22,8 @@ export async function POST(req: Request) {
 
     const user = await auth?.verifyIdToken(idToken);
 
+    console.log('User in register:', user);
+
     if (user?.uid) {
       const cookieStore = await cookies();
 
@@ -32,15 +34,17 @@ export async function POST(req: Request) {
         path: '/',
       });
 
+      console.log('before create user', user.uid, userName, companyName);
+
       const userData = await createUser({
         userId: user.uid,
         userName,
         companyName,
-				role,
-				companyId: companyName
-			} );
+        role,
+        companyId: companyName,
+      });
 
-			return Response.json({ userData });
+      return Response.json({ userData });
     }
 
     return Response.json({ message: 'User register successful' });

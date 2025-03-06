@@ -9,7 +9,7 @@ const { auth } = getFirebaseAppServerSide();
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl.pathname;
-  const publicPaths = ['/login', '/', '/demo', '/api/auth'];
+  const publicPaths = ['/login', '/', '/demo', '/api/auth', '/api/register'];
 
   if (publicPaths.some((path) => url === path)) {
     return NextResponse.next();

@@ -1,4 +1,16 @@
-// 'use server';
+'use server';
+
+import { addDoc, collection } from 'firebase/firestore';
+
+import getFirebaseAppServerSide from '../../lib/firebase/get-firebase-app-server-side';
+import { RegisterProps } from '../../lib/utils';
+
+type User = Omit<RegisterProps, 'idToken'> & {
+  companyId: string;
+  userId: string;
+};
+
+import 'source-map-support/register';
 
 // import { z } from 'zod';
 
@@ -8,6 +20,20 @@
 //   email: z.string().email(),
 //   password: z.string().min(6),
 // });
+
+export async function createUser(userData: User) {
+  console.log('userData', userData);
+  try {
+    const { db } = getFirebaseAppServerSide();
+    if (!db) {
+      throw new Error('Firestore is not available');
+    }
+    const userRef = await db.collection('users').add(userData);
+    console.log('Document written with ID: ', userRef.id);
+  } catch (e) {
+    console.error('Error adding document: ', e);
+  }
+}
 
 // export interface LoginActionState {
 //   status: 'idle' | 'in_progress' | 'success' | 'failed' | 'invalid_data';
