@@ -1,0 +1,86 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: summary-webhook-node
+  namespace: '1049460234657'
+  selfLink: >-
+    /apis/serving.knative.dev/v1/namespaces/1049460234657/services/summary-webhook-node
+  uid: 92437d2b-99d5-47f7-b75a-428ffe32c602
+  resourceVersion: AAYv4qO+4rI
+  generation: 8
+  creationTimestamp: '2025-03-07T13:09:43.507486Z'
+  labels:
+    goog-drz-cloudfunctions-id: summary-webhook
+    goog-drz-cloudfunctions-location: europe-central2
+    cloud.googleapis.com/location: europe-central2
+  annotations:
+    serving.knative.dev/creator: ptasia6concept@gmail.com
+    serving.knative.dev/lastModifier: ptasia6concept@gmail.com
+    run.googleapis.com/build-base-image: gcr.io/serverless-runtimes/google-22/runtimes/nodejs22
+    run.googleapis.com/build-enable-automatic-updates: 'true'
+    run.googleapis.com/client-name: cloud-console
+    run.googleapis.com/build-function-target: document-summary-node-event-handler
+    run.googleapis.com/build-name: >-
+      projects/1049460234657/locations/europe-central2/builds/17701a71-0394-4c30-b67c-6b5ab199b561
+    run.googleapis.com/build-source-location: >-
+      gs://run-sources-gen-lang-client-0612957264-europe-central2/services/summary-webhook-node/1741420312.643000.zip#1741420312994311
+    run.googleapis.com/build-image-uri: >-
+      europe-central2-docker.pkg.dev/gen-lang-client-0612957264/cloud-run-source-deploy/summary-webhook-node
+    run.googleapis.com/operation-id: daa345d7-1f82-4ce7-9fe0-2c7099d1f6e4
+    run.googleapis.com/ingress: all
+    run.googleapis.com/ingress-status: all
+    run.googleapis.com/urls: >-
+      ["https://summary-webhook-node-1049460234657.europe-central2.run.app","https://summary-webhook-node-hvyzropd5a-lm.a.run.app"]
+spec:
+  template:
+    metadata:
+      labels:
+        client.knative.dev/nonce: 7ad27e35-1ba0-457c-8e6c-5a1b49919fa3
+        run.googleapis.com/startupProbeType: Default
+      annotations:
+        autoscaling.knative.dev/maxScale: '100'
+        run.googleapis.com/client-name: cloud-console
+        run.googleapis.com/startup-cpu-boost: 'true'
+        run.googleapis.com/base-images: >-
+          {"summary-webhook-node-1":"gcr.io/serverless-runtimes/google-22/runtimes/nodejs22"}
+    spec:
+      containerConcurrency: 1
+      timeoutSeconds: 90
+      serviceAccountName: summary-webhook-sa@gen-lang-client-0612957264.iam.gserviceaccount.com
+      containers:
+        - name: summary-webhook-node-1
+          image: >-
+            europe-central2-docker.pkg.dev/gen-lang-client-0612957264/cloud-run-source-deploy/summary-webhook-node@sha256:3758e2cff9b10f82e94e555829e7932e54566ea47659363c56e7ae5ee592b8f1
+          ports:
+            - name: http1
+              containerPort: 8080
+          env:
+            - name: BQ_DATASET
+              value: summary_dataset
+            - name: BQ_TABLE
+              value: summaries
+            - name: DOCAI_LOCATION
+              value: us
+            - name: DOCAI_PROCESSOR
+              value: >-
+                projects/gen-lang-client-0612957264/locations/us/processors/4dd65984d08ab626
+            - name: LOG_EXECUTION_ID
+              value: 'true'
+            - name: OUTPUT_BUCKET
+              value: summary-main-gen-lang-client-0612957264
+            - name: GCLOUD_PROJECT
+              value: gen-lang-client-0612957264
+          resources:
+            limits:
+              cpu: 583m
+              memory: 1G
+          startupProbe:
+            timeoutSeconds: 240
+            periodSeconds: 240
+            failureThreshold: 1
+            tcpSocket:
+              port: 8080
+      runtimeClassName: run.googleapis.com/linux-base-image-update
+  traffic:
+    - percent: 100
+      latestRevision: true
