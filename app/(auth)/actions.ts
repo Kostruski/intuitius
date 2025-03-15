@@ -35,6 +35,52 @@ export async function createUser(userData: User) {
   }
 }
 
+export async function askDocumentsQuestion(formData: FormData) {
+  const prompt = formData.get('prompt');
+
+  try {
+    const response = await fetch(process.env.RAG_ENDPOINT as string, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ prompt }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    console.log('response in from google', response);
+
+    // Assuming the response is a multipart/form-data with text and file.
+    const contentType = response.headers.get('content-type');
+
+    if (!contentType || !contentType.includes('multipart/form-data')) {
+      throw new Error('Expected multipart/form-data response.');
+    }
+
+    const formDataResponse = await response.formData();
+
+    const textResponse = formDataResponse.get('textResponse') as string | null;
+    const fileResponse = formDataResponse.get('fileResponse') as File | null;
+
+    if (!textResponse || !fileResponse) {
+      throw new Error(
+        'Missing textResponse or fileResponse in multipart data.',
+      );
+    }
+
+    const textString = textResponse; // Already a string from formData
+    const file = fileResponse; // file object from formData
+
+    return { text: textString, file: file };
+  } catch (error) {
+    console.error('Error prompt', error);
+    return { error };
+  }
+}
+
 // export interface LoginActionState {
 //   status: 'idle' | 'in_progress' | 'success' | 'failed' | 'invalid_data';
 // }
