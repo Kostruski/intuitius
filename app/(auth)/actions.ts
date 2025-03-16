@@ -1,7 +1,11 @@
 'use server';
 
+import fs from 'fs';
+import path from 'path';
+
 import { addDoc, collection } from 'firebase/firestore';
 
+import getCloudStorage from '../../lib/cloud-storage/get-cloud-storage';
 import getFirebaseAppServerSide from '../../lib/firebase/get-firebase-app-server-side';
 import { RegisterProps } from '../../lib/utils';
 
@@ -51,33 +55,49 @@ export async function askDocumentsQuestion(formData: FormData) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    console.log('response in from google', response);
-
     // Assuming the response is a multipart/form-data with text and file.
     const contentType = response.headers.get('content-type');
 
-    if (!contentType || !contentType.includes('multipart/form-data')) {
-      throw new Error('Expected multipart/form-data response.');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Expected application/json response.');
     }
 
-    const formDataResponse = await response.formData();
+    const jsonData = await response.json();
 
-    const textResponse = formDataResponse.get('textResponse') as string | null;
-    const fileResponse = formDataResponse.get('fileResponse') as File | null;
-
-    if (!textResponse || !fileResponse) {
-      throw new Error(
-        'Missing textResponse or fileResponse in multipart data.',
-      );
-    }
-
-    const textString = textResponse; // Already a string from formData
-    const file = fileResponse; // file object from formData
-
-    return { text: textString, file: file };
+    return jsonData;
   } catch (error) {
     console.error('Error prompt', error);
-    return { error };
+    return { error: (error as Error).message };
+  }
+}
+
+export async function downloadFile(formData: FormData) {
+  const filePath = formData.get('filePath') as string;
+
+  if (!filePath) {
+    return { error: 'File path is required' };
+  }
+
+  try {
+    const [bucketName, ...fileParts] = filePath.replace('gs://', '').split('/');
+    const fileName = fileParts.join('/');
+
+    const storage = getCloudStorage();
+
+    const bucket = storage.bucket(process.env.DOCUMENTS_BUCKET_ID);
+    const file = bucket.file(fileName);
+
+    const readStream = file.createReadStream();
+
+    const headers = new Headers({
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+      'Content-Type': 'application/octet-stream', // Or your specific content type
+    });
+
+    return { readStream };
+  } catch (error) {
+    console.error('Error downloading file:', error);
+    return { error: 'Failed to download file' };
   }
 }
 

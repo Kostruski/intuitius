@@ -42,3 +42,5 @@ yarn-error.log*
 
 #local settings
 lib/firebase/google-service-account.json
+
+tsconfig.tsbuildinfo
