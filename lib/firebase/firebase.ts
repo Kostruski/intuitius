@@ -6,13 +6,14 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   GoogleAuthProvider,
+  onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
 
-import { handleLogout, postToken } from '../utils';
+import { handleLogout, handleUserRegister, postToken } from '../utils';
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -36,6 +37,19 @@ export const getFirebaseAppClientSide = () => {
 
 const { app: firebaseApp, authInstance: firebaseAuth } =
   getFirebaseAppClientSide();
+
+onAuthStateChanged(firebaseAuth, async (user) => {
+  try {
+    if (user) {
+      const idToken = await user.getIdToken(); // Get fresh token
+      // Send idToken with your API request to the server
+      await postToken(idToken);
+    }
+  } catch (error) {
+    console.error('Auth state change error:', error);
+    await handleLogout();
+  }
+});
 
 // Example: Google Sign-In Provider (add more providers as needed)
 export const googleProvider = new GoogleAuthProvider();
@@ -68,10 +82,19 @@ export async function signOutUser() {
   }
 }
 
-export async function createUserWithEmailAndPasswordFunc(
-  email: string,
-  password: string,
-) {
+export async function createUserWithEmailAndPasswordFunc({
+  email,
+  password,
+  userName = 'testuser',
+  companyName = 'testcompany',
+  role = 'user',
+}: {
+  email: string;
+  password: string;
+  userName?: string;
+  companyName?: string;
+  role?: 'user' | 'manager';
+}) {
   try {
     const userCredential = await createUserWithEmailAndPassword(
       firebaseAuth,
@@ -81,8 +104,13 @@ export async function createUserWithEmailAndPasswordFunc(
     const user = userCredential.user;
     console.log('User created:', user);
     const idToken = await user.getIdToken();
-    await postToken(idToken);
-    return user;
+    const currentUser = await handleUserRegister({
+      idToken,
+      userName,
+      companyName,
+      role,
+    });
+    return currentUser;
   } catch (error) {
     console.error('Error creating user:', error);
     throw error;

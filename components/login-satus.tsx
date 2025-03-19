@@ -18,7 +18,6 @@ const LoginStatus = () => {
     router.push('/');
   };
 
-  console.log('user');
   return (
     <div className="p-4">
       {user && (

@@ -9,13 +9,11 @@ export async function POST(req: Request) {
   try {
     const { idToken } = await req.json();
 
-    console.log(idToken, 'idToken');
-
     if (!idToken) {
       return Response.json({ error: 'ID token is required' }, { status: 400 });
     }
 
-    const x = await auth.verifyIdToken(idToken);
+    const x = await auth?.verifyIdToken(idToken);
 
     const cookieStore = await cookies();
 

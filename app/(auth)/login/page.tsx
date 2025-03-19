@@ -2,7 +2,7 @@
 
 import { User } from '@firebase/auth';
 import { Label } from '@radix-ui/react-label';
-import { Button, Flex } from '@radix-ui/themes';
+import { Box, Button, Container, Flex } from '@radix-ui/themes';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -14,6 +14,7 @@ import {
   sendPasswordResetEmailFunc,
 } from '../../../lib/firebase/firebase';
 import { postToken } from '../../../lib/utils';
+import { createUser } from '../actions';
 
 export default function Login() {
   const [user, setUser] = useState<User | null>(null);
@@ -41,8 +42,11 @@ export default function Login() {
   const handleEmailSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const user = await createUserWithEmailAndPasswordFunc(email, password);
-      setUser(user);
+      const user = await createUserWithEmailAndPasswordFunc({
+        email,
+        password,
+      });
+      console.log('User created:', user);
       setEmail('');
       setPassword('');
     } catch (error) {
@@ -170,6 +174,22 @@ export default function Login() {
               <button type="submit">Reset Password</button>
             </form>
           )}
+          <Container>
+            <Box>
+              <Button
+                onClick={() => {
+                  createUser({
+                    companyName: 'test company',
+                    userName: 'test user',
+                    companyId: 'test company id',
+                    userId: 'test user id',
+                  });
+                }}
+              >
+                Add user to data base
+              </Button>
+            </Box>
+          </Container>
         </>
       )}
     </Flex>

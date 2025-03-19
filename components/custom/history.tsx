@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import cx from "classnames";
-import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
-import { User } from "next-auth";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
+import cx from 'classnames';
+import Link from 'next/link';
+import { useParams, usePathname } from 'next/navigation';
+import { User } from 'next-auth';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import useSWR from 'swr';
 
-import { Chat } from "@/db/schema";
-import { fetcher, getTitleFromChat } from "@/lib/utils";
+import { Chat } from '@/db/schema';
+import { fetcher, getTitleFromChat } from '@/lib/utils';
 
 import {
   InfoIcon,
@@ -18,7 +18,7 @@ import {
   MoreHorizontalIcon,
   PencilEditIcon,
   TrashIcon,
-} from "./icons";
+} from './icons';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,24 +28,25 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../ui/alert-dialog";
-import { Button } from "../ui/button";
+} from '../ui/alert-dialog';
+import { Button } from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from '../ui/dropdown-menu';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "../ui/sheet";
+} from '../ui/sheet';
 
 export const History = ({ user }: { user: User | undefined }) => {
-  const { id } = useParams();
+  // const { id } = useParams();
+  const id = '1';
   const pathname = usePathname();
 
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
@@ -53,7 +54,7 @@ export const History = ({ user }: { user: User | undefined }) => {
     data: history,
     isLoading,
     mutate,
-  } = useSWR<Array<Chat>>(user ? "/api/history" : null, fetcher, {
+  } = useSWR<Array<Chat>>(user ? '/api/history' : null, fetcher, {
     fallbackData: [],
   });
 
@@ -66,20 +67,20 @@ export const History = ({ user }: { user: User | undefined }) => {
 
   const handleDelete = async () => {
     const deletePromise = fetch(`/api/chat?id=${deleteId}`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
 
     toast.promise(deletePromise, {
-      loading: "Deleting chat...",
+      loading: 'Deleting chat...',
       success: () => {
         mutate((history) => {
           if (history) {
             return history.filter((h) => h.id !== id);
           }
         });
-        return "Chat deleted successfully";
+        return 'Chat deleted successfully';
       },
-      error: "Failed to delete chat",
+      error: 'Failed to delete chat',
     });
 
     setShowDeleteDialog(false);
@@ -108,7 +109,7 @@ export const History = ({ user }: { user: User | undefined }) => {
             <VisuallyHidden.Root>
               <SheetTitle className="text-left">History</SheetTitle>
               <SheetDescription className="text-left">
-                {history === undefined ? "loading" : history.length} chats
+                {history === undefined ? 'loading' : history.length} chats
               </SheetDescription>
             </VisuallyHidden.Root>
           </SheetHeader>
@@ -118,7 +119,7 @@ export const History = ({ user }: { user: User | undefined }) => {
               <div className="dark:text-zinc-300">History</div>
 
               <div className="dark:text-zinc-400 text-zinc-500">
-                {history === undefined ? "loading" : history.length} chats
+                {history === undefined ? 'loading' : history.length} chats
               </div>
             </div>
           </div>
@@ -168,14 +169,14 @@ export const History = ({ user }: { user: User | undefined }) => {
                   <div
                     key={chat.id}
                     className={cx(
-                      "flex flex-row items-center gap-6 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-md pr-2",
-                      { "bg-zinc-200 dark:bg-zinc-700": chat.id === id },
+                      'flex flex-row items-center gap-6 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-md pr-2',
+                      { 'bg-zinc-200 dark:bg-zinc-700': chat.id === id },
                     )}
                   >
                     <Button
                       variant="ghost"
                       className={cx(
-                        "hover:bg-zinc-200 dark:hover:bg-zinc-700 justify-between p-0 text-sm font-normal flex flex-row items-center gap-2 pr-2 w-full transition-none",
+                        'hover:bg-zinc-200 dark:hover:bg-zinc-700 justify-between p-0 text-sm font-normal flex flex-row items-center gap-2 pr-2 w-full transition-none',
                       )}
                       asChild
                     >

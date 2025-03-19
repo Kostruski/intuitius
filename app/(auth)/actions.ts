@@ -1,4 +1,20 @@
-// 'use server';
+'use server';
+
+import fs from 'fs';
+import path from 'path';
+
+import { addDoc, collection } from 'firebase/firestore';
+
+import getCloudStorage from '../../lib/cloud-storage/get-cloud-storage';
+import getFirebaseAppServerSide from '../../lib/firebase/get-firebase-app-server-side';
+import { RegisterProps } from '../../lib/utils';
+
+type User = Omit<RegisterProps, 'idToken'> & {
+  companyId: string;
+  userId: string;
+};
+
+import 'source-map-support/register';
 
 // import { z } from 'zod';
 
@@ -8,6 +24,82 @@
 //   email: z.string().email(),
 //   password: z.string().min(6),
 // });
+
+export async function createUser(userData: User) {
+  console.log('userData', userData);
+  try {
+    const { db } = getFirebaseAppServerSide();
+    if (!db) {
+      throw new Error('Firestore is not available');
+    }
+    const userRef = await db.collection('users').add(userData);
+    console.log('Document written with ID: ', userRef.id);
+  } catch (e) {
+    console.error('Error adding document: ', e);
+  }
+}
+
+export async function askDocumentsQuestion(formData: FormData) {
+  const prompt = formData.get('prompt');
+
+  try {
+    const response = await fetch(process.env.RAG_ENDPOINT as string, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ prompt }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // Assuming the response is a multipart/form-data with text and file.
+    const contentType = response.headers.get('content-type');
+
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Expected application/json response.');
+    }
+
+    const jsonData = await response.json();
+
+    return jsonData;
+  } catch (error) {
+    console.error('Error prompt', error);
+    return { error: (error as Error).message };
+  }
+}
+
+export async function downloadFile(formData: FormData) {
+  const filePath = formData.get('filePath') as string;
+
+  if (!filePath) {
+    return { error: 'File path is required' };
+  }
+
+  try {
+    const [bucketName, ...fileParts] = filePath.replace('gs://', '').split('/');
+    const fileName = fileParts.join('/');
+
+    const storage = getCloudStorage();
+
+    const bucket = storage.bucket(process.env.DOCUMENTS_BUCKET_ID);
+    const file = bucket.file(fileName);
+
+    const readStream = file.createReadStream();
+
+    const headers = new Headers({
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+      'Content-Type': 'application/octet-stream', // Or your specific content type
+    });
+
+    return { readStream };
+  } catch (error) {
+    console.error('Error downloading file:', error);
+    return { error: 'Failed to download file' };
+  }
+}
 
 // export interface LoginActionState {
 //   status: 'idle' | 'in_progress' | 'success' | 'failed' | 'invalid_data';

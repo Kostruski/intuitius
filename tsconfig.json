@@ -37,7 +37,9 @@
 		"middleware.js",
 		"middleware.js",
 		"lib/firebase/.google-service-account.ts",
-		"lib/firebase/get-firebase-app-server-side.js"
+		"lib/firebase/get-firebase-app-server-side.js",
+		"app/(auth)/actions.ts",
+		"cloud-functions/index.js"
 	],
 	"exclude": [
 		"node_modules"
