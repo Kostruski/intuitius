@@ -1,23 +1,21 @@
 'use client';
 
-import { User } from '@firebase/auth';
 import { Label } from '@radix-ui/react-label';
 import { Box, Button, Card, Flex, Heading, Tabs, Text } from '@radix-ui/themes';
 import { Mail, Lock, LogIn, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 import {
   signInWithEmailAndPasswordFunc,
   createUserWithEmailAndPasswordFunc,
   signInWithGoogle,
-  signOutUser,
   sendPasswordResetEmailFunc,
+  getFirebaseAppClientSide,
 } from '../../../lib/firebase/firebase';
-import { postToken } from '../../../lib/utils';
 
 export default function Login() {
-  const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [resetPasswordEmail, setResetPasswordEmail] = useState('');
@@ -25,14 +23,21 @@ export default function Login() {
   const [resetPasswordError, setResetPasswordError] = useState('');
   const [loginError, setLoginError] = useState('');
   const [signupError, setSignupError] = useState('');
+  const { authInstance } = getFirebaseAppClientSide();
+  const [user, loading, error] = useAuthState(authInstance);
   const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user]);
 
   const handleEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoginError('');
     try {
       const user = await signInWithEmailAndPasswordFunc(email, password);
-      setUser(user);
       setEmail('');
       setPassword('');
     } catch (error: any) {
@@ -63,7 +68,6 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     try {
       const user = await signInWithGoogle();
-      setUser(user);
     } catch (error) {
       console.error('Sign-in failed:', error);
     }
@@ -88,15 +92,6 @@ export default function Login() {
       console.error('Password reset failed:', error);
     }
   };
-
-  useEffect(() => {
-    if (user) {
-      router.push('/'); // Redirect to home page
-      user.getIdToken().then((token) => {
-        postToken(token);
-      });
-    }
-  }, [user, router]);
 
   return (
     <Flex

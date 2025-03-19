@@ -11,10 +11,7 @@ import { LogOut, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-import {
-  getFirebaseAppClientSide,
-  signOutUser,
-} from '../lib/firebase/firebase';
+import { getFirebaseAppClientSide } from '../lib/firebase/firebase';
 
 const LoginStatus = () => {
   const { authInstance } = getFirebaseAppClientSide();

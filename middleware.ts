@@ -8,7 +8,7 @@ const { auth } = getFirebaseAppServerSide();
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl.pathname;
-  const publicPaths = ['/login', '/', '/api/auth', '/api/register'];
+  const publicPaths = ['/login', '/', '/api/auth', '/api/register', '/logout'];
 
   if (publicPaths.some((path) => url === path)) {
     return NextResponse.next();
@@ -17,14 +17,20 @@ export async function middleware(req: NextRequest) {
   try {
     const cookieStore = await cookies(); // Use cookies() directly
     const idToken = cookieStore.get('token')?.value;
+    const loginUrl = new URL('/login', req.url);
 
     if (!idToken) {
-      const loginUrl = new URL('/login', req.url);
+      console.log('no token');
       return NextResponse.redirect(loginUrl);
       // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const verification = await auth?.verifyIdToken(idToken);
+
+    if (!verification) {
+      console.log('no verified token');
+      return NextResponse.redirect(loginUrl);
+    }
 
     return NextResponse.next(); // User is authorized, cookies are already set.
   } catch (error: any) {

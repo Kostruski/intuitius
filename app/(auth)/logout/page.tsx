@@ -17,9 +17,10 @@ const LogoutPage = () => {
     authInstance
       .signOut()
       .then(() => {
-        setMessage('Logged out');
-        setStatus('success');
-        handleLogout();
+        handleLogout().then(() => {
+          setMessage('Logged out');
+          setStatus('success');
+        });
       })
       .catch((error) => {
         console.error('Error signing out:', error);
