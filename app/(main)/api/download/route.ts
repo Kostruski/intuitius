@@ -13,8 +13,15 @@ export async function GET(request: Request) {
     );
   }
 
+  const serviceAccount = process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT
+    ? JSON.parse(process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT)
+    : {};
+
   try {
-    const storage = new Storage();
+    const storage = new Storage({
+      projectId: process.env.PROJECT_ID,
+      credentials: serviceAccount,
+    });
     const bucket = storage.bucket(bucketName);
     const file = bucket.file(fileName);
 
@@ -30,9 +37,9 @@ export async function GET(request: Request) {
 
     for await (const chunk of readStream) {
       chunks.push(chunk);
-		}
+    }
 
-		const buffer = Buffer.concat(chunks);
+    const buffer = Buffer.concat(chunks);
 
     const headers = new Headers({
       'Content-Disposition': `attachment; filename="${fileName}"`,
@@ -44,7 +51,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Error streaming file:', error);
     return NextResponse.json(
-      { error: 'Failed to stream file' },
+      { error: `Failed to stream file: ${error}` },
       { status: 500 },
     );
   }
