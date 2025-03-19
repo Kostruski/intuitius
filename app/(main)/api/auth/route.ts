@@ -40,7 +40,7 @@ export async function DELETE() {
       sameSite: 'strict',
       path: '/',
       expires: new Date(0),
-    });
+		} );
 
     return Response.json({ message: 'Logout successful' });
   } catch (error) {

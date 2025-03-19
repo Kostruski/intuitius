@@ -4,12 +4,15 @@ import {
   Box,
   Button,
   Card,
+  Container,
   Flex,
+  IconButton,
   Spinner,
   TextArea,
   TextField,
 } from '@radix-ui/themes';
-import { useState, useRef } from 'react';
+import { FileTextIcon } from 'lucide-react';
+import { useState, useRef, useActionState } from 'react';
 
 import { askDocumentsQuestion } from '../(auth)/actions';
 
@@ -21,18 +24,16 @@ type DATA = {
 };
 
 export default function MyComponent() {
-  const [result, setResult] = useState<DATA | null>(null);
   const textInput = useRef(null);
-  const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
-  async function handleSubmit(formData: FormData) {
-    setLoading(true);
-    const data = await askDocumentsQuestion(formData);
-    setLoading(false);
+  const [result, formAction, loading] = useActionState(handleSubmit, {} as any);
 
-    setResult(data);
+  async function handleSubmit(_, formData: FormData) {
+    return await askDocumentsQuestion(formData);
   }
+
+  console.log('result', result);
 
   const [, ...fileParts] =
     result?.filePath?.replace('gs://', '').split('/') || [];
@@ -67,10 +68,45 @@ export default function MyComponent() {
     }
   };
 
+  const documents = [
+    'EKOMOR TDT.pdf',
+    'EL-23-046.pdf',
+    'EL-24-031.pdf',
+    'EL-24-053.pdf',
+    'SKM_C250i23090509420.pdf',
+  ];
+
   return (
     <Flex direction="column" gap={'2'} align="center">
+      <Container>Dokumenty znajdujące się w bazie:</Container>
+      <Flex
+        direction="row"
+        align="center"
+        justify="center"
+        className="p-4"
+        wrap={'wrap'}
+        gap={'2'}
+      >
+        {documents.map((d) => (
+          <Button
+            key={d}
+            onClick={() => {
+              handleFileDownload(d);
+            }}
+            className="p-3"
+            variant="outline"
+            loading={downloading}
+            asChild
+          >
+            <a href="#">
+              <FileTextIcon className="mr-2" />
+              {d}
+            </a>
+          </Button>
+        ))}
+      </Flex>
       <Box className="p-6" width="600px">
-        <form action={handleSubmit}>
+        <form action={formAction}>
           <TextArea
             size="3"
             name="prompt"
@@ -78,9 +114,11 @@ export default function MyComponent() {
             ref={textInput}
           />
           <Box className="my-4">
-            <Button type="submit">
-              {loading ? <Spinner size="3" /> : 'Wyślij'}
-            </Button>
+            {loading ? (
+              <Spinner size="3" />
+            ) : (
+              <Button type="submit">Wyślij</Button>
+            )}
           </Box>
 
           {result && result.text && (
@@ -107,7 +145,7 @@ export default function MyComponent() {
                 disabled={downloading}
                 onClick={() => handleFileDownload(fileName)}
               >
-                {downloading ? 'Downloading...' : 'Download'}
+                {downloading ? 'Downloading...' : 'Downloaded'}
               </Button>
             </Box>
           )}
