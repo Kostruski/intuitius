@@ -19,6 +19,7 @@ const LogoutPage = () => {
       .then(() => {
         setMessage('Logged out');
         setStatus('success');
+        handleLogout();
       })
       .catch((error) => {
         console.error('Error signing out:', error);

@@ -6,7 +6,6 @@ import {
   Card,
   Container,
   Flex,
-  IconButton,
   Spinner,
   TextArea,
   TextField,
@@ -32,8 +31,6 @@ export default function MyComponent() {
   async function handleSubmit(_, formData: FormData) {
     return await askDocumentsQuestion(formData);
   }
-
-  console.log('result', result);
 
   const [, ...fileParts] =
     result?.filePath?.replace('gs://', '').split('/') || [];
