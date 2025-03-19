@@ -98,15 +98,6 @@ export default function Login() {
     }
   }, [user, router]);
 
-  if (user) {
-    router.push('/');
-    return (
-      <Flex direction="column" gap="4" align="center" justify="center" p="4">
-        <Text>Redirecting to home page...</Text>
-      </Flex>
-    );
-  }
-
   return (
     <Flex
       direction="column"
