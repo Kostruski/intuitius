@@ -28,7 +28,7 @@ export default function MyComponent() {
 
   const [result, formAction, loading] = useActionState(handleSubmit, {} as any);
 
-  async function handleSubmit(_, formData: FormData) {
+  async function handleSubmit(_: any, formData: FormData) {
     return await askDocumentsQuestion(formData);
   }
 

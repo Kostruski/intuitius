@@ -22,7 +22,7 @@ export default async function RootLayout({
         <Theme>
           <Flex direction="column" style={{ minHeight: '100vh' }}>
             {/* Header */}
-            <Box as="header" className="sticky top-0 z-10 bg-white border-b">
+            <Box className="sticky top-0 z-10 bg-white border-b">
               <Container size="4" py="4">
                 <Flex justify="between" align="center">
                   <Box>
@@ -34,14 +34,14 @@ export default async function RootLayout({
             </Box>
 
             {/* Main content */}
-            <Box className="flex-1" as="main">
+            <Box className="flex-1" as="div">
               <Container size="4" py="6">
                 {children}
               </Container>
             </Box>
 
             {/* Footer */}
-            <Box as="footer" className="bg-gray-50 border-t">
+            <Box as="div" className="bg-gray-50 border-t">
               <Container size="4" py="4">
                 <Flex
                   justify="between"
