@@ -1,5 +1,4 @@
 // middleware.ts
-import { getAppCheck } from 'firebase-admin/app-check';
 import { cookies } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -9,14 +8,7 @@ const { auth } = getFirebaseAppServerSide();
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl.pathname;
-  const publicPaths = [
-    '/login',
-    '/',
-    '/demo',
-    '/api/auth',
-    '/api/register',
-    '/api/download',
-  ];
+  const publicPaths = ['/login', '/', '/api/auth', '/api/register'];
 
   if (publicPaths.some((path) => url === path)) {
     return NextResponse.next();
