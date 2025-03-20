@@ -204,7 +204,7 @@ export const handleUserRegister = async (registerProps: RegisterProps) => {
 
     if (response.ok) {
       console.log('Register successful');
-      // Redirect or update UI
+      return response;
     } else {
       console.error('Register failed');
     }

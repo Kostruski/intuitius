@@ -14,6 +14,7 @@ import {
   sendPasswordResetEmailFunc,
   getFirebaseAppClientSide,
 } from '../../../lib/firebase/firebase';
+import { postToken } from '../../../lib/utils';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -24,7 +25,7 @@ export default function Login() {
   const [loginError, setLoginError] = useState('');
   const [signupError, setSignupError] = useState('');
   const { authInstance } = getFirebaseAppClientSide();
-  const [user, loading, error] = useAuthState(authInstance);
+  const [user] = useAuthState(authInstance);
   const router = useRouter();
 
   useEffect(() => {
@@ -52,10 +53,11 @@ export default function Login() {
     e.preventDefault();
     setSignupError('');
     try {
-      const user = await createUserWithEmailAndPasswordFunc({
+      const user: any = await createUserWithEmailAndPasswordFunc({
         email,
         password,
       });
+      if (user.accessToken) await postToken(user.accessToken);
       console.log('User created:', user);
       setEmail('');
       setPassword('');
@@ -68,6 +70,8 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     try {
       const user = await signInWithGoogle();
+      const idToken = await user.getIdToken();
+      await postToken(idToken);
     } catch (error) {
       console.error('Sign-in failed:', error);
     }
