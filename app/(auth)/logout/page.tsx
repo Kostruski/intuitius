@@ -20,6 +20,7 @@ const LogoutPage = () => {
         handleLogout().then(() => {
           setMessage('Logged out');
           setStatus('success');
+          router.push('/');
         });
       })
       .catch((error) => {
@@ -57,35 +58,21 @@ const LogoutPage = () => {
             {message}
           </Text>
 
-          {status !== 'processing' && (
-            <Flex gap="3" className="mt-4">
-              <Button variant="outline" onClick={() => router.push('/')}>
-                <Home size={16} />
-                <Text>Home</Text>
+          <Flex gap="3" className="mt-4">
+            {status === 'error' && (
+              <Button
+                color="red"
+                onClick={() => {
+                  setStatus('processing');
+                  setMessage('Trying again...');
+                  window.location.reload();
+                }}
+              >
+                <Text>Try Again</Text>
+                <ArrowRight size={16} />
               </Button>
-
-              {status === 'success' && (
-                <Button onClick={() => router.push('/login')}>
-                  <Text>Log In Again</Text>
-                  <ArrowRight size={16} />
-                </Button>
-              )}
-
-              {status === 'error' && (
-                <Button
-                  color="red"
-                  onClick={() => {
-                    setStatus('processing');
-                    setMessage('Trying again...');
-                    window.location.reload();
-                  }}
-                >
-                  <Text>Try Again</Text>
-                  <ArrowRight size={16} />
-                </Button>
-              )}
-            </Flex>
-          )}
+            )}
+          </Flex>
         </Flex>
       </Card>
     </Flex>
